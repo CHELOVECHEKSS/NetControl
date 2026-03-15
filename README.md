@@ -90,3 +90,7 @@ NetControl/
     ├── audio/              — звуки интерфейса
     └── font/               — FiraCode, FiraMono
 ```
+
+## Звуки
+
+Звуковые эффекты интерфейса взяты из проекта [eDEX-UI](https://github.com/GitSquared/edex-ui) by GitSquared, распространяются под лицензией GPL-3.0.
