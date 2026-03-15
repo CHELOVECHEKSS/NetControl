@@ -1,0 +1,17 @@
+{
+    "theme": "dark",
+    "language": "ru",
+    "notifications": true,
+    "auto_refresh": true,
+    "refresh_interval": 5,
+    "max_ports": 50,
+    "log_level": "info",
+    "animation_speed": "normal",
+    "show_stats": true,
+    "advanced": {
+        "timeout": 30,
+        "retry_attempts": 3,
+        "buffer_size": 4096,
+        "enable_logging": true
+    }
+}

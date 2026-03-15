@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Control Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+
+    <!-- Интро оверлей -->
+    <div id="intro-overlay">
+        <canvas id="intro-matrix" style="display:none"></canvas>
+        <div id="intro-scanlines" style="display:none"></div>
+        <div class="intro-corner" style="top:20px;left:20px;opacity:0"></div>
+        <div class="intro-corner" style="top:20px;right:20px;opacity:0"></div>
+        <div class="intro-corner" style="bottom:20px;left:20px;opacity:0"></div>
+        <div class="intro-corner" style="bottom:20px;right:20px;opacity:0"></div>
+
+        <!-- Фаза 1: чистый CMD -->
+        <div id="intro-cmd">
+            <div id="intro-cmd-history"></div>
+            <div id="intro-cmd-line">
+                <span class="intro-term-prompt">C:\NetControl&gt;&nbsp;</span><span id="intro-term-input"></span><span class="intro-cursor">█</span>
+            </div>
+        </div>
+
+        <!-- Фаза 2: интро (скрыто до Enter) -->
+        <div id="intro-content" style="display:none">
+            <div id="intro-logo">
+                <img src="{{ url_for('static', filename='icons/logo.svg') }}" alt="Logo" id="intro-logo-img">
+            </div>
+            <div id="intro-title"><span id="intro-title-text"></span><span class="intro-cursor">█</span></div>
+            <div id="intro-subtitle" style="opacity:0">NETWORK CONTROL PANEL</div>
+        </div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+    
+    <nav class="sidebar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='icons/logo.svg') }}" class="logo-icon" alt="Logo">
+            <h1>NetControl</h1>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item active" data-section="ports">
+                <img src="{{ url_for('static', filename='icons/port.svg') }}" class="nav-icon" alt="Ports">
+                <span class="text" data-i18n="nav.ports">Сканер портов</span>
+            </li>
+            <li class="nav-item" data-section="ping">
+                <img src="{{ url_for('static', filename='icons/ping.svg') }}" class="nav-icon" alt="Ping">
+                <span class="text" data-i18n="nav.ping">Ping/Trace</span>
+            </li>
+            <li class="nav-item" data-section="dns">
+                <img src="{{ url_for('static', filename='icons/dns.svg') }}" class="nav-icon" alt="DNS">
+                <span class="text" data-i18n="nav.dns">DNS Lookup</span>
+            </li>
+            <li class="nav-item" data-section="whois">
+                <img src="{{ url_for('static', filename='icons/globe.svg') }}" class="nav-icon" alt="WHOIS">
+                <span class="text" data-i18n="nav.whois">WHOIS</span>
+            </li>
+            <li class="nav-item" data-section="geo">
+                <img src="{{ url_for('static', filename='icons/location.svg') }}" class="nav-icon" alt="Geo">
+                <span class="text" data-i18n="nav.geo">IP Geo</span>
+            </li>
+            <li class="nav-item" data-section="ssl">
+                <img src="{{ url_for('static', filename='icons/shield.svg') }}" class="nav-icon" alt="SSL">
+                <span class="text" data-i18n="nav.ssl">SSL Checker</span>
+            </li>
+            <li class="nav-item" data-section="monitor">
+                <img src="{{ url_for('static', filename='icons/monitor.svg') }}" class="nav-icon" alt="Monitor">
+                <span class="text" data-i18n="nav.monitor">Monitor</span>
+            </li>
+            <li class="nav-item" data-section="subnet">
+                <img src="{{ url_for('static', filename='icons/calculator.svg') }}" class="nav-icon" alt="Subnet">
+                <span class="text" data-i18n="nav.subnet">Subnet Calc</span>
+            </li>
+            <li class="nav-item" data-section="tools">
+                <img src="{{ url_for('static', filename='icons/tools.svg') }}" class="nav-icon" alt="Tools">
+                <span class="text" data-i18n="nav.tools">Tools</span>
+            </li>
+            <li class="nav-item" data-section="stress">
+                <img src="{{ url_for('static', filename='icons/activity.svg') }}" class="nav-icon" alt="Stress">
+                <span class="text" data-i18n="nav.stress">Stress Test</span>
+            </li>
+            <li class="nav-item" data-section="about">
+                <img src="{{ url_for('static', filename='icons/info.svg') }}" class="nav-icon" alt="About">
+                <span class="text">О программе</span>
+            </li>
+            <li class="nav-item" data-section="settings">
+                <img src="{{ url_for('static', filename='icons/settings.svg') }}" class="nav-icon" alt="Settings">
+                <span class="text" data-i18n="nav.settings">Настройки</span>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <div class="status-indicator">
+                <span class="pulse"></span>
+                <span data-i18n="nav.online">Онлайн</span>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="content">
+        <section id="ports-section" class="section active">
+            <div class="section-header">
+                <h2 data-i18n="ports.title">Сканер портов</h2>
+            </div>
+            <div class="tool-tabs">
+                <button class="tab-btn active" data-tab="single-scan-tab" data-i18n="ports.tab.single">Один хост</button>
+                <button class="tab-btn" data-tab="multi-scan-tab" data-i18n="ports.tab.multi">Несколько хостов</button>
+            </div>
+            <div id="single-scan-tab" class="tab-content active">
+                <div class="scan-controls">
+                    <div class="form-group">
+                        <label data-i18n="ports.host">Хост / IP адрес</label>
+                        <input type="text" id="scan-host" class="input-field" placeholder="127.0.0.1" value="127.0.0.1">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.start_port">Начальный порт</label>
+                        <input type="number" id="start-port" class="input-field" placeholder="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.end_port">Конечный порт</label>
+                        <input type="number" id="end-port" class="input-field" placeholder="1024" value="1024">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.threads">Потоков</label>
+                        <input type="number" id="threads-count" class="input-field" placeholder="100" value="100" min="1" max="500">
+                    </div>
+                    <button class="btn btn-primary" id="start-scan-btn">
+                        <img src="{{ url_for('static', filename='icons/scan.svg') }}" class="btn-icon" alt="Scan">
+                        <span id="scan-btn-text" data-i18n="ports.btn.start">Начать сканирование</span>
+                    </button>
+                </div>
+                <div class="progress-container" id="progress-container" style="display: none;">
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                    <div class="progress-text" id="progress-text">0%</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/server.svg') }}" class="stat-icon-img" alt="Total">
+                        <div class="stat-info"><h3 id="total-scanned">0</h3><p data-i18n="ports.stat.scanned">Просканировано</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/activity.svg') }}" class="stat-icon-img" alt="Open">
+                        <div class="stat-info"><h3 id="total-open">0</h3><p data-i18n="ports.stat.open">Открытых портов</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/chart.svg') }}" class="stat-icon-img" alt="Chart">
+                        <div class="stat-info"><h3 id="scan-time">0s</h3><p data-i18n="ports.stat.time">Время сканирования</p></div>
+                    </div>
+                </div>
+                <div class="ports-container" id="ports-list"></div>
+            </div>
+            <div id="multi-scan-tab" class="tab-content">
+                <div class="scan-controls-multi">
+                    <div class="form-group">
+                        <label data-i18n="ports.multi.hosts">IP адреса (каждый с новой строки, поддержка масок)</label>
+                        <textarea id="multi-hosts" class="input-field" rows="8" placeholder="192.168.1.1&#10;192.168.1.*&#10;26.*.*.*&#10;10.0.0-10.*"></textarea>
+                        <small style="color: var(--text-secondary); font-size: 0.85rem; display: block; margin-top: 0.5rem;" data-i18n="ports.multi.hint">Примеры: 192.168.1.* | 26.*.*.* | 10.0.0-10.* | google.com</small>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.start_port">Начальный порт</label>
+                        <input type="number" id="multi-start-port" class="input-field" placeholder="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.end_port">Конечный порт</label>
+                        <input type="number" id="multi-end-port" class="input-field" placeholder="1024" value="1024">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ports.threads">Потоков</label>
+                        <input type="number" id="multi-threads" class="input-field" value="200" min="1" max="500">
+                    </div>
+                    <button class="btn btn-primary" id="start-multi-scan-btn">
+                        <img src="{{ url_for('static', filename='icons/scan.svg') }}" class="btn-icon" alt="Scan">
+                        <span id="multi-scan-btn-text" data-i18n="ports.multi.btn.start">Начать массовое сканирование</span>
+                    </button>
+                </div>
+                <div class="progress-container" id="multi-progress-container" style="display: none;">
+                    <div class="progress-bar"><div class="progress-fill" id="multi-progress-fill"></div></div>
+                    <div class="progress-text" id="multi-progress-text">0%</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/server.svg') }}" class="stat-icon-img" alt="Hosts">
+                        <div class="stat-info"><h3 id="multi-total-hosts">0</h3><p data-i18n="ports.multi.stat.hosts">Хостов проверено</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/activity.svg') }}" class="stat-icon-img" alt="Open">
+                        <div class="stat-info"><h3 id="multi-total-open">0</h3><p data-i18n="ports.stat.open">Открытых портов</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <img src="{{ url_for('static', filename='icons/chart.svg') }}" class="stat-icon-img" alt="Time">
+                        <div class="stat-info"><h3 id="multi-scan-time">0s</h3><p data-i18n="ports.stat.time">Время сканирования</p></div>
+                    </div>
+                </div>
+                <div class="multi-results-container" id="multi-results-list"></div>
+            </div>
+        </section>
+        
+        <!-- WHOIS -->
+        <section id="whois-section" class="section">
+            <div class="section-header">
+                <h2>WHOIS Информация</h2>
+            </div>
+            <div class="form-group">
+                <div class="whois-search">
+                    <input type="text" id="domain-input" placeholder="Введите домен (например, google.com)" class="input-field">
+                    <button class="btn btn-primary" id="whois-btn">Поиск</button>
+                </div>
+            </div>
+            <div class="result-box" id="whois-result"></div>
+        </section>
+        
+        <!-- Ping & Traceroute -->
+        {% include 'sections.html' %}
+        
+        <!-- О программе -->
+        <section id="about-section" class="section">
+            <div class="section-header">
+                <h2>О программе</h2>
+            </div>
+
+            <!-- Шапка -->
+            <div style="background:var(--bg-card); border:1px solid var(--primary); padding:2rem; margin-bottom:2rem; display:flex; align-items:center; gap:2rem;">
+                <img src="{{ url_for('static', filename='icons/logo.svg') }}" style="width:72px;height:72px;filter:invert(1) sepia(1) saturate(5) hue-rotate(90deg) drop-shadow(0 0 12px #00ff41); flex-shrink:0;" alt="Logo">
+                <div>
+                    <div style="font-family:'FiraCode',monospace; font-size:1.8rem; color:var(--primary); letter-spacing:0.15em;">NetControl</div>
+                    <div style="color:var(--text-secondary); margin-top:0.4rem; font-size:0.85rem; letter-spacing:0.1em;">NETWORK CONTROL PANEL &nbsp;·&nbsp; v1.0.0 &nbsp;·&nbsp; by <span style="color:var(--primary)">CHELOVECHEK</span></div>
+                    <div style="margin-top:0.75rem; color:#ccc; line-height:1.7; font-size:0.9rem;">
+                        Учебный инструмент для анализа, мониторинга и диагностики сети.<br>
+                        Создан исключительно в <span style="color:var(--primary)">познавательных целях</span>.
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+
+                <!-- Возможности -->
+                <div class="settings-group" style="margin-bottom:0;">
+                    <h3>Возможности</h3>
+                    <div style="display:grid; gap:0.6rem; margin-top:0.5rem;">
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Сканирование портов (одиночное и массовое)
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Ping и Traceroute
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> DNS Lookup (A, MX, NS, TXT, CNAME)
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> WHOIS информация о домене
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Геолокация IP адреса
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Проверка SSL сертификатов
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Мониторинг сетевых соединений
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Калькулятор подсетей (CIDR)
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Сетевые утилиты
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--text-secondary); font-size:0.9rem;">
+                            <span style="color:var(--primary); font-size:1rem;">▸</span> Стресс-тестирование (HTTP / TCP / ICMP)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Стек технологий -->
+                <div class="settings-group" style="margin-bottom:0;">
+                    <h3>Стек технологий</h3>
+                    <div style="display:grid; gap:0.75rem; margin-top:0.5rem;">
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">Python 3</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">Flask · Flask-SocketIO · python-whois · dnspython</span>
+                        </div>
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">JavaScript</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">Vanilla JS · Socket.IO client</span>
+                        </div>
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">CSS</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">Custom · FiraCode · FiraMono · UnitedSans</span>
+                        </div>
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">HTML</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">Jinja2 templates</span>
+                        </div>
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">Audio</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">eDEX-UI sound pack (MIT)</span>
+                        </div>
+                        <div style="background:var(--bg-dark); border:1px solid var(--border); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:var(--primary); font-family:'FiraCode',monospace;">Transport</span>
+                            <span style="color:var(--text-secondary); font-size:0.85rem;">WebSocket · REST API</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+
+                <!-- Авторские права -->
+                <div class="settings-group" style="margin-bottom:0;">
+                    <h3>Авторские права и лицензии</h3>
+                    <div style="line-height:1.8; color:var(--text-secondary); font-size:0.9rem;">
+                        <p>Звуковые эффекты взяты из проекта <span style="color:var(--primary)">eDEX-UI</span>, распространяемого под лицензией MIT.</p>
+                        <p style="margin-top:0.75rem;">
+                            eDEX-UI &copy; <a href="https://github.com/GitSquared/edex-ui" target="_blank" style="color:var(--primary); text-decoration:none;">GitSquared</a>
+                        </p>
+                        <div style="margin-top:1rem; background:rgba(255,51,51,0.08); border:1px solid var(--danger); padding:0.75rem 1rem; font-size:0.85rem;">
+                            <span style="color:var(--danger);">⚠ Важно:</span>
+                            <span style="color:var(--text-secondary);"> звуки из eDEX-UI нельзя использовать в сторонних коммерческих проектах без соблюдения условий MIT лицензии и указания авторства.</span>
+                        </div>
+                        <p style="margin-top:1rem;">Шрифты: <span style="color:var(--primary)">Fira Code</span> и <span style="color:var(--primary)">Fira Mono</span> — SIL Open Font License.</p>
+                        <p style="margin-top:0.5rem;">Шрифт: <span style="color:var(--primary)">United Sans</span> — используется только в рамках данного проекта.</p>
+                    </div>
+                </div>
+
+                <!-- Архитектура -->
+                <div class="settings-group" style="margin-bottom:0;">
+                    <h3>Архитектура</h3>
+                    <div style="font-size:0.85rem; color:var(--text-secondary); line-height:1.8;">
+                        <p style="color:var(--primary); font-family:'FiraCode',monospace; margin-bottom:0.75rem;">[ Client ] ←WebSocket→ [ Server ]</p>
+                        <div style="display:grid; gap:0.4rem;">
+                            <div><span style="color:var(--primary);">app.py</span> — Flask сервер, API endpoints, SocketIO</div>
+                            <div><span style="color:var(--primary);">modules/</span> — бизнес-логика (сканер, DNS, SSL и др.)</div>
+                            <div><span style="color:var(--primary);">static/js/app.js</span> — навигация, уведомления, звуки</div>
+                            <div><span style="color:var(--primary);">static/js/modules.js</span> — логика всех разделов</div>
+                            <div><span style="color:var(--primary);">static/js/intro.js</span> — CMD интро анимация</div>
+                            <div><span style="color:var(--primary);">static/js/i18n.js</span> — система локализации RU/EN</div>
+                            <div><span style="color:var(--primary);">templates/</span> — Jinja2 HTML шаблоны</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="settings-group">
+                <h3>⚠ Disclaimer / Отказ от ответственности</h3>
+                <div style="color:var(--text-secondary); line-height:1.9; font-size:0.9rem;">
+                    <p>Данная программа создана исключительно в <span style="color:var(--primary)">образовательных и познавательных целях</span>.</p>
+                    <p style="margin-top:0.75rem;">Все инструменты предназначены для использования <span style="color:var(--primary)">только на системах и сетях, к которым у вас есть явное разрешение</span>. Несанкционированное сканирование портов, стресс-тестирование и другие действия могут быть незаконны в вашей юрисдикции.</p>
+                    <p style="margin-top:0.75rem;">Автор <span style="color:var(--danger)">не несёт ответственности</span> за любой ущерб, причинённый использованием данного программного обеспечения в незаконных или неэтичных целях.</p>
+                    <p style="margin-top:0.75rem; color:#555;">Используя программу, вы подтверждаете, что понимаете и принимаете данные условия.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Настройки -->
+        <section id="settings-section" class="section">
+            <div class="section-header">
+                <h2 data-i18n="settings.title">Настройки</h2>
+            </div>
+            <div class="settings-container">
+                <div class="settings-group">
+                    <h3 data-i18n="settings.general">Основные</h3>
+                    <div class="setting-item">
+                        <label data-i18n="settings.theme">Тема</label>
+                        <select id="theme-select" class="input-field">
+                            <option value="dark" data-i18n="settings.theme.dark">Темная</option>
+                            <option value="light" data-i18n="settings.theme.light">Светлая</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="settings.language">Язык</label>
+                        <select id="language-select" class="input-field">
+                            <option value="ru">Русский</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="settings.notifications">Уведомления</label>
+                        <label class="switch">
+                            <input type="checkbox" id="notifications-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3 data-i18n="settings.advanced">Расширенные</h3>
+                    <div class="setting-item">
+                        <label data-i18n="settings.timeout">Таймаут (сек)</label>
+                        <input type="number" id="timeout-input" class="input-field" value="30">
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="settings.retry">Попытки повтора</label>
+                        <input type="number" id="retry-input" class="input-field" value="3">
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="settings.buffer">Размер буфера</label>
+                        <input type="number" id="buffer-input" class="input-field" value="4096">
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="settings.logging">Логирование</label>
+                        <label class="switch">
+                            <input type="checkbox" id="logging-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <button class="btn btn-success" id="save-settings-btn" data-i18n="settings.save">Сохранить настройки</button>
+            </div>
+        </section>
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/lang/ru.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lang/en.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/intro.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/exit.js') }}"></script>
+</body>
+</html>

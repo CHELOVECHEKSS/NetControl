@@ -1,0 +1,1403 @@
+@font-face {
+    font-family: 'FiraCode';
+    src: url('/assets/font/fira_code.woff2') format('woff2');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'FiraMono';
+    src: url('/assets/font/fira_mono.woff2') format('woff2');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'UnitedSans';
+    src: url('/assets/font/united_sans_light.woff2') format('woff2');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'UnitedSans';
+    src: url('/assets/font/united_sans_medium.woff2') format('woff2');
+    font-weight: 500;
+}
+
+:root {
+    --primary: #00ff41;
+    --primary-dark: #00cc33;
+    --secondary: #00cc33;
+    --success: #00ff41;
+    --danger: #ff3333;
+    --warning: #ffcc00;
+    --bg-dark: #000000;
+    --bg-card: #0a0a0a;
+    --bg-hover: #111111;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --border: #222222;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'FiraMono', 'Consolas', monospace;
+    font-weight: 300;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* Частицы на фоне */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Боковая панель */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: #000;
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 2rem;
+    margin-bottom: 3rem;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    animation: rotate 3s linear infinite;
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg);
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-family: 'FiraCode', monospace;
+    font-weight: 500;
+    color: var(--primary);
+    letter-spacing: 0.1em;
+}
+
+.nav-menu {
+    list-style: none;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.nav-item.nav-visible {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.15s ease, transform 0.15s ease, background 0.3s ease;
+}
+
+.nav-item::before {
+    content: '>';
+    position: absolute;
+    left: 0.75rem;
+    color: var(--primary);
+    font-family: 'FiraCode', monospace;
+    font-size: 0.9rem;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--primary);
+}
+
+.nav-item.active::before {
+    transform: scaleY(1);
+}
+
+.nav-item.active {
+    background: var(--bg-hover);
+    color: var(--primary);
+}
+
+.nav-item .nav-icon {
+    width: 24px;
+    height: 24px;
+    filter: invert(1) brightness(0.5);
+    transition: all 0.2s ease;
+}
+
+.nav-item.active .nav-icon,
+.nav-item:hover .nav-icon {
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg);
+}
+
+.stat-icon-img {
+    width: 48px;
+    height: 48px;
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg);
+    opacity: 0.7;
+}
+
+.btn-icon {
+    width: 18px;
+    height: 18px;
+    filter: invert(1);
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    right: 2rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 0.5rem;
+    border: 1px solid var(--success);
+}
+
+.pulse {
+    width: 10px;
+    height: 10px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Основной контент */
+.content {
+    margin-left: 280px;
+    padding: 2rem;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    visibility: hidden;
+}
+
+.section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    font-family: 'FiraCode', monospace;
+    color: var(--primary);
+    letter-spacing: 0.05em;
+}
+
+/* Кнопки */
+.btn {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--primary);
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-family: 'FiraCode', monospace;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: var(--primary);
+    letter-spacing: 0.05em;
+}
+
+.btn:hover {
+    background: var(--primary);
+    color: #000000;
+    transform: none;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+}
+
+.btn-primary {
+    background: transparent;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background: var(--primary);
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    background: var(--text-secondary);
+    color: #000;
+    box-shadow: none;
+}
+
+.btn-success {
+    background: transparent;
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.btn-success:hover {
+    background: var(--success);
+    color: #000;
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.btn-danger:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+/* Статистика */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+    animation: slideUp 0.5s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.15);
+    transform: none;
+}
+
+.stat-icon-img {
+    width: 48px;
+    height: 48px;
+    color: var(--primary);
+}
+
+.stat-info h3 {
+    font-size: 1.5rem;
+    font-family: 'FiraCode', monospace;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-info p {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-family: 'FiraMono', monospace;
+}
+
+/* Порты */
+.ports-container {
+    display: grid;
+    gap: 1rem;
+}
+
+.port-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    animation: slideIn 0.3s ease;
+}
+
+.port-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+
+.port-info {
+    display: flex;
+    gap: 2rem;
+}
+
+.port-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.port-detail label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.port-detail span {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.port-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* WHOIS */
+.whois-search {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.input-field {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: 'FiraCode', monospace;
+    transition: border-color 0.15s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(0, 255, 65, 0.2);
+}
+
+.whois-result {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    min-height: 300px;
+}
+
+.whois-data {
+    display: grid;
+    gap: 1rem;
+}
+
+.whois-item {
+    display: flex;
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+}
+
+.whois-item label {
+    color: var(--text-secondary);
+    min-width: 150px;
+}
+
+.whois-item span {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Настройки */
+.settings-container {
+    max-width: 800px;
+}
+
+.settings-group {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.settings-group h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item label {
+    color: var(--text-primary);
+}
+
+.setting-item .input-field {
+    width: 200px;
+}
+
+/* Переключатель */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-hover);
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 500px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+/* Загрузка */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* Сканер портов */
+.scan-controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 100px auto;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: end;
+}
+
+.scan-controls .form-group {
+    margin-bottom: 0;
+}
+
+/* Прогресс бар */
+.progress-container {
+    margin-bottom: 2rem;
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 16px;
+    background: var(--bg-dark);
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 0;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-family: 'FiraCode', monospace;
+    font-weight: normal;
+    color: var(--primary);
+}
+
+/* Результаты сканирования */
+.port-result {
+    background: var(--bg-card);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 100px 1fr 150px 200px;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    animation: slideIn 0.3s ease;
+}
+
+.port-result:hover {
+    border-color: var(--success);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.2);
+}
+
+.port-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.port-service {
+    color: var(--text-secondary);
+}
+
+.port-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 0.5rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.port-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.port-timestamp {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+
+/* Табы */
+.tool-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: -2px;
+    font-size: 0.9rem;
+    font-family: 'FiraCode', monospace;
+    letter-spacing: 0.05em;
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.tab-btn:hover {
+    color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Result Box */
+.result-box {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    min-height: 200px;
+    margin-top: 1.5rem;
+}
+
+.result-item {
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.result-value {
+    color: var(--text-primary);
+    font-family: 'FiraMono', 'Consolas', monospace;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+/* Textarea */
+textarea.input-field {
+    resize: vertical;
+    font-family: 'FiraCode', 'Consolas', monospace;
+}
+
+/* Hop Item (Traceroute) */
+.hop-item {
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.hop-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.hop-ip {
+    color: var(--text-primary);
+    font-family: 'Consolas', monospace;
+}
+
+.hop-time {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Connection Item */
+.connection-item {
+    padding: 0.75rem 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.connection-local {
+    color: var(--primary);
+    font-family: 'Consolas', monospace;
+}
+
+.connection-remote {
+    color: var(--text-primary);
+    font-family: 'Consolas', monospace;
+}
+
+.connection-status {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* DNS Record */
+.dns-record-group {
+    margin-bottom: 2rem;
+}
+
+.dns-record-group h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.dns-record {
+    padding: 0.75rem 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-family: 'FiraMono', 'Consolas', monospace;
+}
+
+/* SSL Certificate */
+.ssl-cert-item {
+    padding: 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.ssl-cert-item h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.ssl-expired {
+    color: var(--danger);
+}
+
+.ssl-valid {
+    color: var(--success);
+}
+
+/* Scrollbar */
+.result-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.result-box::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+    border-radius: 4px;
+}
+
+.result-box::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+.result-box::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Loading spinner */
+.spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+}
+
+
+/* Geo Location Cards */
+.geo-location-card,
+.geo-network-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--primary);
+    margin-top: 1.5rem;
+}
+
+.geo-location-card h4,
+.geo-network-card h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.geo-location-card .result-item,
+.geo-network-card .result-item {
+    background: var(--bg-dark);
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.geo-location-card .result-item:last-child,
+.geo-network-card .result-item:last-child {
+    margin-bottom: 0;
+}
+
+
+/* Массовое сканирование */
+.scan-controls-multi {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: end;
+}
+
+.scan-controls-multi .form-group {
+    margin-bottom: 0;
+}
+
+.multi-results-container {
+    display: grid;
+    gap: 1rem;
+}
+
+.host-result {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+.host-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.host-ip {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'Consolas', monospace;
+}
+
+.host-count {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.host-ports {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.host-port-item {
+    background: var(--bg-dark);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.host-port-item:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.port-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.port-service {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+
+/* Stress Test */
+.stress-options {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+}
+
+.stress-log-item {
+    padding: 0.5rem 1rem;
+    background: var(--bg-dark);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: 'FiraCode', 'Consolas', monospace;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideIn 0.2s ease;
+}
+
+.stress-log-time {
+    color: var(--text-secondary);
+    min-width: 80px;
+}
+
+.stress-log-message {
+    color: var(--text-primary);
+}
+
+.stress-log-success {
+    color: var(--success);
+}
+
+.stress-log-error {
+    color: var(--danger);
+}
+
+.stress-log-info {
+    color: var(--primary);
+}
+
+.stress-summary {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--primary);
+    margin-top: 1rem;
+}
+
+.stress-summary h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+/* Интро оверлей */
+#intro-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    display: block;
+    cursor: default;
+    transition: opacity 0.6s ease;
+    overflow: hidden;
+}
+
+#intro-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Matrix canvas фон */
+#intro-matrix {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+}
+
+/* Сканлайны */
+#intro-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.3) 2px,
+        rgba(0, 0, 0, 0.3) 4px
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Угловые рамки */
+.intro-corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: var(--primary);
+    border-style: solid;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+}
+#intro-overlay .intro-corner:nth-child(3) { border-width: 2px 0 0 2px; top: 20px; left: 20px; }
+#intro-overlay .intro-corner:nth-child(4) { border-width: 2px 2px 0 0; top: 20px; right: 20px; }
+#intro-overlay .intro-corner:nth-child(5) { border-width: 0 0 2px 2px; bottom: 20px; left: 20px; }
+#intro-overlay .intro-corner:nth-child(6) { border-width: 0 2px 2px 0; bottom: 20px; right: 20px; }
+
+#intro-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+    z-index: 3;
+}
+
+#intro-logo-img {
+    width: 80px;
+    height: 80px;
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    drop-shadow: 0 0 30px var(--primary);
+}
+
+#intro-logo-img.visible {
+    opacity: 1;
+    transform: scale(1);
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg) drop-shadow(0 0 20px #00ff41);
+    animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% { filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg) drop-shadow(0 0 10px #00ff41); }
+    50%       { filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg) drop-shadow(0 0 30px #00ff41); }
+}
+
+#intro-title {
+    font-family: 'FiraCode', monospace;
+    font-size: 3.5rem;
+    color: var(--primary);
+    letter-spacing: 0.4em;
+    margin: 1rem 0 0.5rem;
+    text-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+    min-height: 4rem;
+}
+
+.intro-cursor {
+    animation: blink 0.7s step-end infinite;
+    color: var(--primary);
+}
+
+#intro-subtitle {
+    font-family: 'FiraMono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.6em;
+    margin-bottom: 0.5rem;
+    transition: opacity 0.5s ease;
+}
+
+#intro-tagline {
+    font-family: 'FiraCode', monospace;
+    font-size: 0.7rem;
+    color: #005500;
+    letter-spacing: 0.2em;
+    margin-bottom: 2.5rem;
+    min-height: 1.2rem;
+    transition: opacity 0.3s ease;
+}
+
+#intro-prompt {
+    font-family: 'FiraCode', monospace;
+    font-size: 0.9rem;
+    color: var(--primary);
+    letter-spacing: 0.25em;
+    transition: opacity 0.5s ease;
+    animation: promptBlink 1.2s step-end infinite;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+@keyframes promptBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes glitch {
+    0%   { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; transform: translate(0); }
+    20%  { text-shadow: -2px 0 #ff0000, 2px 0 #0000ff; transform: translate(-2px, 1px); }
+    40%  { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; transform: translate(2px, -1px); }
+    60%  { text-shadow: -2px 0 #ff0000, 2px 0 #0000ff; transform: translate(0); }
+    80%  { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; transform: translate(1px, 1px); }
+    100% { text-shadow: 0 0 20px rgba(0,255,65,0.6); transform: translate(0); }
+}
+
+.glitch-active {
+    animation: glitch 0.3s ease !important;
+}
+
+/* Глитч при получении данных */
+@keyframes glitch-in {
+    0%   { clip-path: inset(40% 0 60% 0); transform: translate(-4px, 0); opacity: 0.5; }
+    20%  { clip-path: inset(10% 0 80% 0); transform: translate(4px, 0);  opacity: 0.7; }
+    40%  { clip-path: inset(70% 0 10% 0); transform: translate(-2px, 0); opacity: 0.6; }
+    60%  { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0);  opacity: 0.8; }
+    80%  { clip-path: inset(0% 0 0% 0);   transform: translate(0);       opacity: 0.9; }
+    100% { clip-path: none;               transform: translate(0);       opacity: 1;   }
+}
+
+.glitch-data-in {
+    animation: glitch-in 0.25s steps(1) forwards;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Интро терминал */
+#intro-terminal {
+    margin-top: 2rem;
+    font-family: 'FiraCode', monospace;
+    font-size: 1rem;
+    text-align: left;
+    display: inline-block;
+    min-width: 420px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#intro-terminal-history {
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    min-height: 1.5rem;
+}
+
+#intro-terminal-history div {
+    margin-bottom: 0.2rem;
+}
+
+#intro-terminal-line {
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+.intro-term-prompt {
+    color: var(--primary);
+    white-space: nowrap;
+}
+
+#intro-term-input {
+    color: #ffffff;
+    letter-spacing: 0.05em;
+}
+
+.intro-term-hint {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: 1.5rem;
+    text-align: center;
+    animation: blink 1.5s step-end infinite;
+}
+
+/* CMD фаза интро */
+#intro-cmd {
+    font-family: 'FiraCode', monospace;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    text-align: left;
+    padding: 1.2rem 1.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#intro-cmd-history {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#intro-cmd-history div {
+    margin-bottom: 0.15rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#intro-cmd-line {
+    display: flex;
+    align-items: center;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+}

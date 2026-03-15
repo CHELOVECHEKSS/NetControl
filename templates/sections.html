@@ -1,0 +1,323 @@
+<!-- Ping & Traceroute -->
+<section id="ping-section" class="section">
+    <div class="section-header">
+        <h2>Ping & Traceroute</h2>
+    </div>
+    
+    <div class="tool-tabs">
+        <button class="tab-btn active" data-tab="ping-tab">Ping</button>
+        <button class="tab-btn" data-tab="trace-tab">Traceroute</button>
+    </div>
+    
+    <div id="ping-tab" class="tab-content active">
+        <div class="scan-controls">
+            <div class="form-group">
+                <label>Хост</label>
+                <input type="text" id="ping-host" class="input-field" placeholder="google.com">
+            </div>
+            <div class="form-group">
+                <label>Количество</label>
+                <input type="number" id="ping-count" class="input-field" value="4" min="1" max="10">
+            </div>
+            <button class="btn btn-primary" id="ping-btn">Ping</button>
+        </div>
+        <div id="ping-result" class="result-box"></div>
+    </div>
+    
+    <div id="trace-tab" class="tab-content">
+        <div class="scan-controls">
+            <div class="form-group">
+                <label>Хост</label>
+                <input type="text" id="trace-host" class="input-field" placeholder="google.com">
+            </div>
+            <button class="btn btn-primary" id="trace-btn">Traceroute</button>
+        </div>
+        <div id="trace-result" class="result-box"></div>
+    </div>
+</section>
+
+<!-- DNS Lookup -->
+<section id="dns-section" class="section">
+    <div class="section-header">
+        <h2>DNS Lookup</h2>
+    </div>
+    
+    <div class="scan-controls">
+        <div class="form-group">
+            <label>Домен</label>
+            <input type="text" id="dns-domain" class="input-field" placeholder="google.com">
+        </div>
+        <button class="btn btn-primary" id="dns-lookup-btn">Все записи</button>
+    </div>
+    
+    <div id="dns-result" class="result-box"></div>
+</section>
+
+<!-- IP Geolocation -->
+<section id="geo-section" class="section">
+    <div class="section-header">
+        <h2>IP Geolocation</h2>
+    </div>
+    
+    <div class="tool-tabs">
+        <button class="tab-btn active" data-tab="geo-lookup-tab">IP Lookup</button>
+        <button class="tab-btn" data-tab="domain-resolve-tab">Домен → IP</button>
+    </div>
+    
+    <div id="geo-lookup-tab" class="tab-content active">
+        <div class="scan-controls">
+            <div class="form-group">
+                <label>IP адрес</label>
+                <input type="text" id="geo-ip" class="input-field" placeholder="8.8.8.8">
+            </div>
+            <button class="btn btn-primary" id="geo-btn">Поиск</button>
+        </div>
+        <div id="geo-result" class="result-box"></div>
+    </div>
+    
+    <div id="domain-resolve-tab" class="tab-content">
+        <div class="scan-controls">
+            <div class="form-group">
+                <label>Домен</label>
+                <input type="text" id="resolve-domain" class="input-field" placeholder="google.com">
+            </div>
+            <button class="btn btn-primary" id="resolve-btn">Получить IP</button>
+        </div>
+        <div id="resolve-result" class="result-box"></div>
+    </div>
+</section>
+
+<!-- SSL Checker -->
+<section id="ssl-section" class="section">
+    <div class="section-header">
+        <h2>SSL/TLS Checker</h2>
+    </div>
+    
+    <div class="scan-controls">
+        <div class="form-group">
+            <label>Домен</label>
+            <input type="text" id="ssl-host" class="input-field" placeholder="google.com">
+        </div>
+        <div class="form-group">
+            <label>Порт</label>
+            <input type="number" id="ssl-port" class="input-field" value="443">
+        </div>
+        <button class="btn btn-primary" id="ssl-btn">Проверить</button>
+    </div>
+    
+    <div id="ssl-result" class="result-box"></div>
+</section>
+
+<!-- Network Monitor -->
+<section id="monitor-section" class="section">
+    <div class="section-header">
+        <h2>Network Monitor</h2>
+        <button class="btn btn-primary" id="monitor-toggle-btn">Старт</button>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <img src="/static/icons/activity.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="upload-speed">0 KB/s</h3>
+                <p>Скорость отправки</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <img src="/static/icons/activity.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="download-speed">0 KB/s</h3>
+                <p>Скорость загрузки</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <img src="/static/icons/server.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="connections-count">0</h3>
+                <p>Активных соединений</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="connections-list" class="result-box"></div>
+</section>
+
+<!-- Subnet Calculator -->
+<section id="subnet-section" class="section">
+    <div class="section-header">
+        <h2>Subnet Calculator</h2>
+    </div>
+    
+    <div class="scan-controls">
+        <div class="form-group">
+            <label>Сеть (CIDR)</label>
+            <input type="text" id="subnet-input" class="input-field" placeholder="192.168.1.0/24">
+        </div>
+        <button class="btn btn-primary" id="subnet-btn">Рассчитать</button>
+    </div>
+    
+    <div id="subnet-result" class="result-box"></div>
+</section>
+
+<!-- Network Tools -->
+<section id="tools-section" class="section">
+    <div class="section-header">
+        <h2>Network Tools</h2>
+    </div>
+    
+    <div class="tool-tabs">
+        <button class="tab-btn active" data-tab="encode-tab">Encode/Decode</button>
+        <button class="tab-btn" data-tab="hash-tab">Hash</button>
+        <button class="tab-btn" data-tab="password-tab">Password</button>
+    </div>
+    
+    <div id="encode-tab" class="tab-content active">
+        <div class="form-group">
+            <label>Текст</label>
+            <textarea id="encode-input" class="input-field" rows="4"></textarea>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" id="base64-encode-btn">Base64 Encode</button>
+            <button class="btn btn-secondary" id="base64-decode-btn">Base64 Decode</button>
+            <button class="btn btn-primary" id="url-encode-btn">URL Encode</button>
+            <button class="btn btn-secondary" id="url-decode-btn">URL Decode</button>
+        </div>
+        <div id="encode-result" class="result-box"></div>
+    </div>
+    
+    <div id="hash-tab" class="tab-content">
+        <div class="form-group">
+            <label>Текст</label>
+            <textarea id="hash-input" class="input-field" rows="4"></textarea>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" data-hash="md5">MD5</button>
+            <button class="btn btn-primary" data-hash="sha1">SHA1</button>
+            <button class="btn btn-primary" data-hash="sha256">SHA256</button>
+            <button class="btn btn-primary" data-hash="sha512">SHA512</button>
+        </div>
+        <div id="hash-result" class="result-box"></div>
+    </div>
+    
+    <div id="password-tab" class="tab-content">
+        <div class="form-group">
+            <label>Длина пароля</label>
+            <input type="number" id="password-length" class="input-field" value="16" min="8" max="64">
+        </div>
+        <div class="setting-item">
+            <label>Специальные символы</label>
+            <label class="switch">
+                <input type="checkbox" id="password-special" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <button class="btn btn-primary" id="generate-password-btn">Генерировать</button>
+        <div id="password-result" class="result-box"></div>
+    </div>
+</section>
+
+<!-- Stress Test -->
+<section id="stress-section" class="section">
+    <div class="section-header">
+        <h2>Stress Test</h2>
+    </div>
+    
+    <div class="scan-controls">
+        <div class="form-group">
+            <label>IP адрес или хост *</label>
+            <input type="text" id="stress-host" class="input-field" placeholder="example.com или 192.168.1.1">
+        </div>
+        
+        <div class="form-group">
+            <label>Количество потоков</label>
+            <input type="number" id="stress-threads" class="input-field" value="10" min="1" max="100">
+        </div>
+        
+        <div class="form-group">
+            <label>Длительность (сек)</label>
+            <input type="number" id="stress-duration" class="input-field" value="30" min="5" max="300">
+        </div>
+    </div>
+    
+    <div class="stress-options">
+        <div class="setting-item">
+            <label>Использовать порты</label>
+            <label class="switch">
+                <input type="checkbox" id="stress-use-ports">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div id="stress-ports-group" class="form-group" style="display: none; margin-top: 1rem;">
+            <label>Порты (через запятую или диапазон)</label>
+            <input type="text" id="stress-ports" class="input-field" placeholder="80,443 или 1-1000">
+        </div>
+        
+        <div class="setting-item">
+            <label>Тип запросов</label>
+            <label class="switch">
+                <input type="checkbox" id="stress-use-method">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div id="stress-method-group" style="display: none; margin-top: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Метод HTTP:</label>
+            <div style="display: flex; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="stress-method" value="GET" checked>
+                    <span>GET</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="radio" name="stress-method" value="POST">
+                    <span>POST</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="button-group" style="margin-top: 2rem;">
+        <button class="btn btn-primary" id="stress-start-btn">Запустить стресс-тест</button>
+        <button class="btn btn-danger" id="stress-stop-btn" style="display: none;">Остановить</button>
+    </div>
+    
+    <div id="stress-progress" class="progress-container" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="stress-progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="stress-progress-text">0%</div>
+    </div>
+    
+    <div id="stress-stats" class="stats-grid" style="display: none; margin-top: 2rem;">
+        <div class="stat-card">
+            <img src="/static/icons/activity.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="stress-requests-sent">0</h3>
+                <p>Запросов отправлено</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <img src="/static/icons/chart.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="stress-requests-success">0</h3>
+                <p>Успешных</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <img src="/static/icons/shield.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="stress-requests-failed">0</h3>
+                <p>Ошибок</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <img src="/static/icons/activity.svg" class="stat-icon-img">
+            <div class="stat-info">
+                <h3 id="stress-avg-time">0 ms</h3>
+                <p>Среднее время</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="stress-result" class="result-box"></div>
+</section>
