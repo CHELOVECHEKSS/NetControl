@@ -58,7 +58,7 @@ python app.py
 ## Структура
 
 ```
-Sitemanager/
+NetControl/
 ├── app.py                  — Flask backend, все API маршруты
 ├── main_desktop.py         — pywebview обёртка
 ├── setup.json              — конфиг автозапуска
